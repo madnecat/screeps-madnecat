@@ -23,7 +23,7 @@ var CONFIG = require('core.config');
 
 // Maximum BFS depth (rooms away from current position) to search
 // for the nearest unexplored room. Limits CPU cost per tick.
-var BFS_MAX_DEPTH = 20;
+var BFS_MAX_DEPTH = 6;
 
 var roleExplorer = {
 
@@ -88,8 +88,11 @@ var roleExplorer = {
                 ' | minerals: ' + (minerals.map(m => m.mineralType).join(', ') || 'none') +
                 ' | ' + status);
 
-            // Rebuild the room report in Memory every time a room is recorded
-            this.updateReport();
+            // Rebuild the room report every 10 room recordings to avoid rewriting
+            // all of Memory.exploredRooms on every single room entry
+            if (!Memory.reportUpdateCount) Memory.reportUpdateCount = 0;
+            Memory.reportUpdateCount++;
+            if (Memory.reportUpdateCount % 10 === 0) this.updateReport();
         }
 
         // ----------------------------------------------------------
@@ -110,7 +113,17 @@ var roleExplorer = {
         // builder can help). Stored in creep memory so it resets on death.
         if (!creep.memory.blockedHops) creep.memory.blockedHops = [];
 
-        var nextHop = this.findNextHop(currentRoom, creep.memory.blockedHops);
+        // Cache BFS result — recompute only when the creep enters a new room.
+        // describeExits() is expensive at scale; the result doesn't change
+        // while the creep stays in the same room.
+        var nextHop;
+        if (creep.memory.bfsRoom === currentRoom && creep.memory.bfsHop !== undefined) {
+            nextHop = creep.memory.bfsHop;
+        } else {
+            nextHop = this.findNextHop(currentRoom, creep.memory.blockedHops);
+            creep.memory.bfsRoom = currentRoom;
+            creep.memory.bfsHop  = nextHop;
+        }
 
         // ----------------------------------------------------------
         // SAFETY: never walk into an avoided room
@@ -195,20 +208,25 @@ var roleExplorer = {
         // ----------------------------------------------------------
         // NAVIGATE toward the next hop room
         //
-        // Use cross-room moveTo (target = center of next room) instead
-        // of manually finding an exit tile. This lets the Screeps
-        // pathfinder handle routing around walls and structures that
-        // block the direct path to the exit tile.
+        // Find the exit tile toward nextHop within the current room,
+        // then moveTo that tile with maxRooms:1 to keep pathfinding
+        // single-room only. Cross-room PathFinder is very expensive;
+        // this approach limits the cost to one room per tick.
         // ----------------------------------------------------------
         // Clear stale empty-path cache — moveTo caches ERR_NO_PATH as "" and never retries
         if (creep.memory._move && creep.memory._move.path === '') {
             delete creep.memory._move;
         }
 
-        var moveResult = creep.moveTo(new RoomPosition(25, 25, nextHop), {
+        var exitDir  = creep.room.findExitTo(nextHop);
+        var exitTile = exitDir > 0 ? creep.pos.findClosestByRange(exitDir) : null;
+        var moveTarget = exitTile || new RoomPosition(25, 25, nextHop);
+
+        var moveResult = creep.moveTo(moveTarget, {
             visualizePathStyle: { stroke: '#ffff00' },
             ignoreCreeps: true,
-            reusePath: 10
+            reusePath: 20,
+            maxRooms: 1
         });
 
         if (moveResult === ERR_NO_PATH) {
@@ -240,6 +258,7 @@ var roleExplorer = {
                 // Foreign room — block this hop, reroute, and nudge randomly
                 if (creep.memory.blockedHops.indexOf(nextHop) === -1) {
                     creep.memory.blockedHops.push(nextHop);
+                    creep.memory.bfsRoom = null; // invalidate cache so BFS reruns with updated blocked list
                     console.log('[Explorer] ' + creep.name +
                         ' cannot reach ' + nextHop + ' from ' + currentRoom +
                         ' — trying alternative route');
