@@ -11,6 +11,7 @@
 // ============================================================
 
 var CONFIG = require('core.config');
+var G      = require('core.globals');
 
 var coreSpawn = {
 
@@ -292,7 +293,7 @@ var coreSpawn = {
         var plan = this.computeSpawnPlan();
         var targetHarvesters = plan ? plan.targets.harvesters : 2;
 
-        var harvesters = _.filter(Game.creeps, c => c.memory.role === 'harvester');
+        var harvesters = G.byRole('harvester');
 
         var spawn = this.getSpawn();
         if (!spawn) return;
@@ -313,7 +314,7 @@ var coreSpawn = {
     // manageUpgrader
     // ----------------------------------------------------------
     manageUpgrader: function () {
-        var upgraders = _.filter(Game.creeps, c => c.memory.role === 'upgrader');
+        var upgraders = G.byRole('upgrader');
         var spawn = this.getSpawn();
         if (!spawn) return;
 
@@ -330,7 +331,7 @@ var coreSpawn = {
     // manageBuilders
     // ----------------------------------------------------------
     manageBuilders: function () {
-        var builders = _.filter(Game.creeps, c => c.memory.role === 'builder');
+        var builders = G.byRole('builder');
         var spawn = this.getSpawn();
         if (!spawn) return;
 
@@ -352,7 +353,7 @@ var coreSpawn = {
     // Not counted as a harvester anywhere.
     // ----------------------------------------------------------
     manageFuelers: function () {
-        var fuelers = _.filter(Game.creeps, function (c) { return c.memory.role === 'fueler'; });
+        var fuelers = G.byRole('fueler');
         if (fuelers.length >= 1) return;
 
         var spawn = this.getSpawn();
@@ -369,11 +370,11 @@ var coreSpawn = {
     // when we actually need a new one.
     // ----------------------------------------------------------
     manageExplorers: function () {
-        var explorers = _.filter(Game.creeps, c => c.memory.role === 'explorer');
+        var explorers = G.byRole('explorer');
 
         if (explorers.length >= CONFIG.TARGET_EXPLORERS) return;
 
-        var harvesters = _.filter(Game.creeps, c => c.memory.role === 'harvester');
+        var harvesters = G.byRole('harvester');
         if (harvesters.length < CONFIG.EXPLORER_MIN_HARVESTERS) {
             if (Game.time % 50 === 0) {
                 console.log('[Explorers] Waiting for harvesters (' +
@@ -382,7 +383,7 @@ var coreSpawn = {
             return;
         }
 
-        var upgraders = _.filter(Game.creeps, c => c.memory.role === 'upgrader');
+        var upgraders = G.byRole('upgrader');
         if (upgraders.length < CONFIG.EXPLORER_MIN_UPGRADERS) {
             if (Game.time % 50 === 0) {
                 console.log('[Explorers] Waiting for upgraders (' +

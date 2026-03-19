@@ -10,6 +10,7 @@
 // ============================================================
 
 var CONFIG       = require('core.config');
+var G            = require('core.globals');
 var moveToTarget = require('MoveToTarget');
 
 var roleUpgrader = {
@@ -21,7 +22,7 @@ var roleUpgrader = {
         // RESCUE MODE
         // No harvesters + spawn critically low — fill spawn first.
         // ----------------------------------------------------------
-        var harvesters = _.filter(Game.creeps, c => c.memory.role === 'harvester');
+        var harvesters = G.byRole('harvester');
         var spawn      = creep.room.find(FIND_MY_SPAWNS)[0];
         var spawnNeedsRescue = spawn
                             && harvesters.length === 0
@@ -35,8 +36,7 @@ var roleUpgrader = {
             creep.say('🆘 U SOS');
 
             if (creep.store[RESOURCE_ENERGY] === 0) {
-                var source = creep.pos.findClosestByPath(FIND_SOURCES)
-                          || creep.pos.findClosestByRange(FIND_SOURCES);
+                var source = creep.pos.findClosestByRange(FIND_SOURCES);
                 if (source && creep.harvest(source) === ERR_NOT_IN_RANGE) {
                     moveToTarget.move(creep,source, { visualizePathStyle: { stroke: '#4488ff' }, reusePath: 5 });
                 }
@@ -92,7 +92,7 @@ var roleUpgrader = {
         // Harvesters are responsible for sources; upgraders should never need to mine.
 
         // 1. Dropped energy on the ground (decays every tick — highest urgency)
-        var dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+        var dropped = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
             filter: r => r.resourceType === RESOURCE_ENERGY && r.amount > 0
         });
         if (dropped) {
@@ -104,7 +104,7 @@ var roleUpgrader = {
         }
 
         // 2. Tombstones — dead creeps carrying energy
-        var tombstone = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
+        var tombstone = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
             filter: t => t.store[RESOURCE_ENERGY] > 0
         });
         if (tombstone) {
@@ -116,7 +116,7 @@ var roleUpgrader = {
         }
 
         // 3. Ruins — decaying structures with leftover energy
-        var ruin = creep.pos.findClosestByPath(FIND_RUINS, {
+        var ruin = creep.pos.findClosestByRange(FIND_RUINS, {
             filter: r => r.store[RESOURCE_ENERGY] > 0
         });
         if (ruin) {
@@ -138,7 +138,7 @@ var roleUpgrader = {
         }
 
         // 5. Containers filled by harvesters
-        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: s => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0
         });
         if (container) {
@@ -150,8 +150,8 @@ var roleUpgrader = {
         }
 
         // 6. Last resort: mine directly from source
-        var source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 })
-                  || creep.pos.findClosestByPath(FIND_SOURCES);
+        var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 })
+                  || creep.pos.findClosestByRange(FIND_SOURCES);
         if (source) {
             creep.say('🔄 U Source');
             if (creep.harvest(source) === ERR_NOT_IN_RANGE) {

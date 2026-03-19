@@ -46,15 +46,15 @@ var roleFueler = {
         var storage = creep.room.storage;
         var storageTarget = (storage && storage.store[RESOURCE_ENERGY] > 0) ? storage : null;
 
-        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function (s) {
                 return s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0;
             }
         });
 
-        var source = creep.pos.findClosestByPath(FIND_SOURCES, {
+        var source = creep.pos.findClosestByRange(FIND_SOURCES, {
             filter: function (s) { return s.energy > 0; }
-        }) || creep.pos.findClosestByPath(FIND_SOURCES);
+        }) || creep.pos.findClosestByRange(FIND_SOURCES);
 
         // Rank by path distance and pick the nearest
         var candidates = [];
@@ -62,7 +62,7 @@ var roleFueler = {
         if (container)     candidates.push(container);
         if (source)        candidates.push(source);
 
-        var target = creep.pos.findClosestByPath(candidates);
+        var target = creep.pos.findClosestByRange(candidates);
 
         if (!target) {
             creep.say('❌ F no src');

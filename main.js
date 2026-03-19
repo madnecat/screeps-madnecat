@@ -2,10 +2,11 @@
 // main.js — Entry point, runs every game tick
 // ============================================================
 
-var CONFIG     = require('core.config');
-var coreSpawn  = require('core.spawn');
-var coreRooms  = require('core.rooms');
-var coreTowers = require('core.towers');
+var CONFIG      = require('core.config');
+var G           = require('core.globals');
+var coreSpawn   = require('core.spawn');
+var coreRooms   = require('core.rooms');
+var coreTowers  = require('core.towers');
 
 var roleHarvester = require('role.harvester');
 var roleUpgrader  = require('role.upgrader');
@@ -14,6 +15,9 @@ var roleExplorer  = require('role.explorer');
 var roleFueler    = require('role.fueler');
 
 module.exports.loop = function () {
+
+    // --- GLOBALS REFRESH (must be first) ---
+    G.refresh();
 
     // --- CPU MONITORING ---
     var cpuStart = Game.cpu.getUsed();

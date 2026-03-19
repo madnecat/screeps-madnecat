@@ -11,6 +11,7 @@
 // ============================================================
 
 var CONFIG       = require('core.config');
+var G            = require('core.globals');
 var moveToTarget = require('MoveToTarget');
 
 var roleBuilder = {
@@ -23,7 +24,7 @@ var roleBuilder = {
         // If no harvesters exist and the spawn is critically low,
         // fill the spawn before doing anything else.
         // ----------------------------------------------------------
-        var harvesters = _.filter(Game.creeps, c => c.memory.role === 'harvester');
+        var harvesters = G.byRole('harvester');
         var spawn      = creep.room.find(FIND_MY_SPAWNS)[0];
         var needsFuel  = spawn
                       && harvesters.length === 0
@@ -37,8 +38,7 @@ var roleBuilder = {
             creep.say('🆘 B Fuel');
 
             if (creep.store[RESOURCE_ENERGY] === 0) {
-                var source = creep.pos.findClosestByPath(FIND_SOURCES)
-                          || creep.pos.findClosestByRange(FIND_SOURCES);
+                var source = creep.pos.findClosestByRange(FIND_SOURCES);
                 if (source && creep.harvest(source) === ERR_NOT_IN_RANGE) {
                     moveToTarget.move(creep,source, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
                 }
@@ -114,7 +114,7 @@ var roleBuilder = {
         // If none exist, repair the most damaged structure instead.
         // ----------------------------------------------------------
         if (creep.memory.building) {
-            var site = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+            var site = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
 
             if (site) {
                 creep.say('🚧 B Build');
@@ -155,7 +155,7 @@ var roleBuilder = {
         // Harvesters are responsible for sources; builders should never need to mine.
 
         // 1. Dropped energy on the ground (decays every tick — highest urgency)
-        var dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+        var dropped = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
             filter: r => r.resourceType === RESOURCE_ENERGY && r.amount > 0
         });
         if (dropped) {
@@ -167,7 +167,7 @@ var roleBuilder = {
         }
 
         // 2. Tombstones — dead creeps carrying energy
-        var tombstone = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
+        var tombstone = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
             filter: t => t.store[RESOURCE_ENERGY] > 0
         });
         if (tombstone) {
@@ -179,7 +179,7 @@ var roleBuilder = {
         }
 
         // 3. Ruins — decaying structures with leftover energy
-        var ruin = creep.pos.findClosestByPath(FIND_RUINS, {
+        var ruin = creep.pos.findClosestByRange(FIND_RUINS, {
             filter: r => r.store[RESOURCE_ENERGY] > 0
         });
         if (ruin) {
@@ -203,22 +203,17 @@ var roleBuilder = {
         // alt 5. Containers filled by harvesters or source directly
         if (CONFIG.BUILDERS_ALLOW_GET_FROM_SOURCE) {
             creep.say('🔄 B s||c');
-            var source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 })
-                        || creep.pos.findClosestByPath(FIND_SOURCES);
+            var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 })
+                        || creep.pos.findClosestByRange(FIND_SOURCES);
 
-            var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: s => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0
             });
-            var pathToSource    = source    ? creep.pos.findPathTo(source)    : null;
-            var pathToContainer = container ? creep.pos.findPathTo(container) : null;
-            var target;
-            if (source && container) {
-                target = pathToSource.length <= pathToContainer.length
-                    ? source
-                    : container;
-            } else {
-                target = container || source;
-            }
+
+            var candidates = [];
+            if (source)    candidates.push(source);
+            if (container) candidates.push(container);
+            var target = creep.pos.findClosestByRange(candidates);
             // Sources require harvest(), structures require withdraw() — use the right call.
             var actionResult = (target === source)
                 ? creep.harvest(target)
@@ -230,7 +225,7 @@ var roleBuilder = {
         }
 
         // 5. Containers filled by harvesters
-        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: s => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0
         });
         if (container) {
@@ -242,8 +237,8 @@ var roleBuilder = {
         }
 
         // 6. Last resort: mine directly from source
-        var source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 })
-                  || creep.pos.findClosestByPath(FIND_SOURCES);
+        var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 })
+                  || creep.pos.findClosestByRange(FIND_SOURCES);
         if (source) {
             creep.say('🔄 B Source');
             if (creep.harvest(source) === ERR_NOT_IN_RANGE) {

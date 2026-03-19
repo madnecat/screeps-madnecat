@@ -8,6 +8,7 @@
 // ============================================================
 
 var CONFIG       = require('core.config');
+var G            = require('core.globals');
 var moveToTarget = require('MoveToTarget');
 
 var roleHarvester = {
@@ -71,9 +72,7 @@ var roleHarvester = {
             }
 
             // Count all harvesters alive.
-            var harvesterCount = _.filter(Game.creeps, function(c) {
-                return c.memory.role === 'harvester';
-            }).length;
+            var harvesterCount = G.byRole('harvester').length;
 
             // If this is the only harvester alive, always act as main regardless of sourceId —
             // the spawn needs energy and there's nobody else to feed it.
@@ -119,9 +118,8 @@ var roleHarvester = {
                 // --------------------------------------------------
                 // Only redirect to feed the spawn if there are no main harvesters alive —
                 // if a main harvester exists, it's already handling spawn/extensions.
-                var mainHarvesterCount = _.filter(Game.creeps, function(c) {
-                    return c.memory.role === 'harvester'
-                        && c.memory.sourceId === Memory.mainSourceId;
+                var mainHarvesterCount = _.filter(G.byRole('harvester'), function(c) {
+                    return c.memory.sourceId === Memory.mainSourceId;
                 }).length;
 
                 if (homeSpawn && !homeSpawn.spawning
@@ -151,7 +149,7 @@ var roleHarvester = {
                     return;
                 }
 
-                var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: function (s) {
                         return s.structureType === STRUCTURE_CONTAINER
                             && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
@@ -166,7 +164,7 @@ var roleHarvester = {
                 }
 
                 // No container yet — fall through to spawn/extensions below
-                var spawnTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                var spawnTarget = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: function (s) {
                         return (
                             (s.structureType === STRUCTURE_EXTENSION && (!assignedSource || assignedSource.pos.getRangeTo(s) <= 10)) ||
@@ -193,7 +191,7 @@ var roleHarvester = {
                 return;
             }
 
-            var closestContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            var closestContainer = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: function (s) {
                         return s.structureType === STRUCTURE_CONTAINER
                             && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
@@ -268,7 +266,7 @@ var roleHarvester = {
         if (inHomeRoom && !creep.memory.remoteRoom) {
             if (!creep.memory.sourceId) {
                 var mainSourceId = Memory.mainSourceId;
-                var allHarvesters = _.filter(Game.creeps, c => c.memory.role === 'harvester');
+                var allHarvesters = G.byRole('harvester');
                 var desiredOnMain = Math.max(1, Math.round(allHarvesters.length * CONFIG.MAIN_SOURCE_RATIO));
                 var othersOnMain = _.filter(allHarvesters, h => h.id !== creep.id && h.memory.sourceId === mainSourceId).length;
                 var roomSources = creep.room.find(FIND_SOURCES);
@@ -292,11 +290,11 @@ var roleHarvester = {
             var assigned = creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : null;
             source = (assigned && assigned.energy > 0)
                 ? assigned
-                : creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 }) || assigned;
+                : creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 }) || assigned;
         } else {
             creep.memory.sourceId = null;
-            source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 })
-                  || creep.pos.findClosestByPath(FIND_SOURCES);
+            source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 })
+                  || creep.pos.findClosestByRange(FIND_SOURCES);
         }
 
         if (!source) {
