@@ -299,44 +299,13 @@ var coreSpawn = {
 
         if (harvesters.length >= targetHarvesters) return;
         
-        // Assign sourceId at spawn time — count current assignments per source.
-        var sources = spawn.room.find(FIND_SOURCES);
-        var srcCount = {};
-        harvesters.forEach(function(h) {
-            if (h.memory.sourceId) srcCount[h.memory.sourceId] = (srcCount[h.memory.sourceId] || 0) + 1;
-        });
-
-        // Count how many harvesters are currently on the main source.
-        var mainSourceId = Memory.mainSourceId;
-        var mainCount = mainSourceId
-            ? harvesters.filter(function(h) { return h.memory.sourceId === mainSourceId; }).length
-            : 0;
-
-        // Desired main harvesters based on configured ratio — always at least 1.
-        var desiredMainCount = Math.max(1, Math.round(harvesters.length * CONFIG.MAIN_SOURCE_RATIO));
-
-        var bestSrc = null;
-        if (mainSourceId && mainCount < desiredMainCount) {
-            // Main source is under-staffed — prioritise spawning a main harvester.
-            bestSrc = Game.getObjectById(mainSourceId);
-        } else {
-            // Normal load-balancing: assign to the source with the fewest harvesters.
-            var bestCnt = Infinity;
-            for (var si = 0; si < sources.length; si++) {
-                var cnt = srcCount[sources[si].id] || 0;
-                if (cnt < bestCnt) { bestCnt = cnt; bestSrc = sources[si]; }
-            }
-        }
-
-        // DISPATCH_ON_MIN_ENERGY or no harvesters at all: spawn immediately with
-        // whatever energy is available. Otherwise wait for the best tier that fits
-        // within energyCapacityAvailable.
-        var hBody = (CONFIG.DISPATCH_ON_MIN_ENERGY || harvesters.length === 0)
+        // If no harvesters exist, spawn immediately with whatever energy is available (priority).
+        // Otherwise wait for the best body tier that fits within energyCapacityAvailable.
+        // Source assignment is handled by role.harvester.js based on MAIN_SOURCE_RATIO.
+        var hBody = (harvesters.length === 0 || CONFIG.DISPATCH_ON_MIN_ENERGY)
             ? this.selectBodyAffordable(CONFIG.HARVESTER_TIERS, spawn.room)
             : this.selectBody(CONFIG.HARVESTER_TIERS, spawn.room);
-        this.trySpawn(spawn, hBody, 'harvester', {
-            sourceId: bestSrc ? bestSrc.id : null
-        });
+        this.trySpawn(spawn, hBody, 'harvester');
         return;
     },
 

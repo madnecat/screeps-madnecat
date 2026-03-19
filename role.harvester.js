@@ -8,7 +8,6 @@
 // ============================================================
 
 var CONFIG       = require('core.config');
-var coreEnergy   = require('core.energy');
 var moveToTarget = require('MoveToTarget');
 
 var roleHarvester = {
@@ -81,6 +80,9 @@ var roleHarvester = {
             var isMainHarvester = creep.memory.sourceId === Memory.mainSourceId
                                || harvesterCount === 1;
 
+            // Used to restrict extension deposits to within 10 tiles of this harvester's source.
+            var assignedSource = creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : null;
+
             if (isMainHarvester) {
                 // --------------------------------------------------
                 // MAIN SOURCE harvester: fill spawn, extensions, towers.
@@ -92,7 +94,7 @@ var roleHarvester = {
                 var spawnTarget = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: function (s) {
                         return (
-                            (s.structureType === STRUCTURE_EXTENSION && creep.pos.getRangeTo(s) <= 5) ||
+                            (s.structureType === STRUCTURE_EXTENSION && (!assignedSource || assignedSource.pos.getRangeTo(s) <= 10)) ||
                              s.structureType === STRUCTURE_SPAWN     ||
                              s.structureType === STRUCTURE_TOWER
                         ) && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
@@ -139,7 +141,7 @@ var roleHarvester = {
                     filter: function (s) {
                         return s.structureType === STRUCTURE_EXTENSION
                             && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                            && creep.pos.getRangeTo(s) <= 5;
+                            && (!assignedSource || assignedSource.pos.getRangeTo(s) <= 10);
                     }
                 });
                 if (nearbyExtension) {
@@ -168,7 +170,7 @@ var roleHarvester = {
                 var spawnTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: function (s) {
                         return (
-                            s.structureType === STRUCTURE_EXTENSION ||
+                            (s.structureType === STRUCTURE_EXTENSION && (!assignedSource || assignedSource.pos.getRangeTo(s) <= 10)) ||
                             s.structureType === STRUCTURE_SPAWN     ||
                             s.structureType === STRUCTURE_TOWER
                         ) && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
@@ -262,15 +264,37 @@ var roleHarvester = {
 
         creep.say(creep.memory.remoteRoom ? '⛏ H Remote' : '⛏ H Energy');
 
-        // Use source assigned at spawn time. Only re-pick if assigned source is empty.
+        // Assign source based on MAIN_SOURCE_RATIO; persist across ticks.
+        // If assigned source is depleted, temporarily mine the closest available source.
         var source;
         if (inHomeRoom && !creep.memory.remoteRoom) {
-            var assigned = creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : null;
-            if (!assigned || assigned.energy === 0) {
-                var chosen = coreEnergy.selectSource(creep);
-                creep.memory.sourceId = chosen ? chosen.id : null;
+            if (!creep.memory.sourceId) {
+                var mainSourceId = Memory.mainSourceId;
+                var allHarvesters = _.filter(Game.creeps, c => c.memory.role === 'harvester');
+                var desiredOnMain = Math.max(1, Math.round(allHarvesters.length * CONFIG.MAIN_SOURCE_RATIO));
+                var othersOnMain = _.filter(allHarvesters, h => h.id !== creep.id && h.memory.sourceId === mainSourceId).length;
+                var roomSources = creep.room.find(FIND_SOURCES);
+                if (mainSourceId && othersOnMain < desiredOnMain) {
+                    creep.memory.sourceId = mainSourceId;
+                } else {
+                    var srcCount = {};
+                    allHarvesters.forEach(function(h) {
+                        if (h.id !== creep.id && h.memory.sourceId) srcCount[h.memory.sourceId] = (srcCount[h.memory.sourceId] || 0) + 1;
+                    });
+                    var bestSrc = null, bestCnt = Infinity;
+                    for (var si = 0; si < roomSources.length; si++) {
+                        if (roomSources[si].id === mainSourceId) continue;
+                        var cnt = srcCount[roomSources[si].id] || 0;
+                        if (cnt < bestCnt) { bestCnt = cnt; bestSrc = roomSources[si]; }
+                    }
+                    if (!bestSrc && roomSources.length > 0) bestSrc = roomSources[0]; // only one source
+                    creep.memory.sourceId = bestSrc ? bestSrc.id : null;
+                }
             }
-            source = creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : null;
+            var assigned = creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : null;
+            source = (assigned && assigned.energy > 0)
+                ? assigned
+                : creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 }) || assigned;
         } else {
             creep.memory.sourceId = null;
             source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: s => s.energy > 0 })
