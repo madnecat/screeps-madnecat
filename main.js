@@ -118,23 +118,27 @@ module.exports.loop = function () {
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
 
-        var cpuBefore = Game.cpu.getUsed();
+        var cpuBefore = CONFIG.CPU_LOGGING ? Game.cpu.getUsed() : 0;
         if (creep.memory.role === 'harvester') roleHarvester.run(creep);
         if (creep.memory.role === 'fueler')    roleFueler.run(creep);
         if (creep.memory.role === 'upgrader')  roleUpgrader.run(creep);
         if (creep.memory.role === 'builder')   roleBuilder.run(creep);
         if (creep.memory.role === 'explorer')  roleExplorer.run(creep);
-        var cpuCreep = Game.cpu.getUsed() - cpuBefore;
-        if (cpuCreep > 1) {
-            console.log('[CPU] ' + name + ' (' + creep.memory.role + ') used ' + cpuCreep.toFixed(2));
+        if (CONFIG.CPU_LOGGING) {
+            var cpuCreep = Game.cpu.getUsed() - cpuBefore;
+            if (cpuCreep > 1) {
+                console.log('[CPU] ' + name + ' (' + creep.memory.role + ') used ' + cpuCreep.toFixed(2));
+            }
         }
     }
 
     // --- CPU SUMMARY ---
-    var cpuTotal = Game.cpu.getUsed() - cpuStart;
-    if (cpuTotal > 15) {
-        console.log('[CPU] ⚠ spike: ' + cpuTotal.toFixed(2) + '/' + Game.cpu.limit + ' at tick ' + Game.time);
-    } else if (Game.time % 100 === 0) {
-        console.log('[CPU] tick ' + Game.time + ': ' + cpuTotal.toFixed(2) + '/' + Game.cpu.limit);
+    if (CONFIG.CPU_LOGGING) {
+        var cpuTotal = Game.cpu.getUsed() - cpuStart;
+        if (cpuTotal > 15) {
+            console.log('[CPU] ⚠ spike: ' + cpuTotal.toFixed(2) + '/' + Game.cpu.limit + ' at tick ' + Game.time);
+        } else if (Game.time % 100 === 0) {
+            console.log('[CPU] tick ' + Game.time + ': ' + cpuTotal.toFixed(2) + '/' + Game.cpu.limit);
+        }
     }
 };

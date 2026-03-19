@@ -11,6 +11,10 @@ var CONFIG = {
     // Use manual console commands to control them individually.
     PAUSE_ALL_CREEPS: false,
 
+    // --- CPU monitoring ---
+    // true: log per-creep CPU usage when > 1 and tick summaries every 100 ticks.
+    CPU_LOGGING: false,
+
     // --- Builder provider switch ---
     // Set to true to allow builders to get energy from sources as much as containers.
     BUILDERS_ALLOW_GET_FROM_SOURCE: true,
