@@ -1,3 +1,4 @@
+// test git
 // ============================================================
 // core.config.js — Central configuration
 //
