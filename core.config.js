@@ -73,7 +73,7 @@ var CONFIG = {
         [WORK, CARRY, MOVE],                                                        //  200 — 1M:2 ✓
         [WORK, WORK, CARRY, MOVE, MOVE],                                            //  350 — 2M:3 ✓  2× harvest
         [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                                     //  400 — 2M:4 ✓  2× harvest + carry
-        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  700 — 3M:5 ✓  3× harvest   (fits RCL3/800)
+        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  550 — 3M:5 ✓  3× harvest   (fits RCL2/550)
         [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], //  900 — 4M:8 ✓  6× harvest   (fits RCL4/1300)
     ],
 
@@ -81,7 +81,7 @@ var CONFIG = {
         [WORK, CARRY, MOVE],                                                        //  200 — 1M:2 ✓
         [WORK, WORK, CARRY, MOVE, MOVE],                                            //  350 — 2M:3 ✓  2× upgrade
         [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                                     //  400 — 2M:4 ✓  2× upgrade + carry
-        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  700 — 3M:5 ✓  3× upgrade   (fits RCL3/800)
+        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  550 — 3M:5 ✓  3× upgrade   (fits RCL2/550)
         [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], //  900 — 4M:8 ✓  6× upgrade   (fits RCL4/1300)
     ],
 
@@ -89,7 +89,7 @@ var CONFIG = {
         [WORK, CARRY, MOVE],                                                        //  200 — 1M:2 ✓
         [WORK, WORK, CARRY, MOVE, MOVE],                                            //  350 — 2M:3 ✓  2× build
         [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                                     //  400 — 2M:4 ✓  2× build + carry
-        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  700 — 3M:5 ✓  3× build     (fits RCL3/800)
+        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  550 — 3M:5 ✓  3× build     (fits RCL2/550)
         [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], // 850 — 4M:8 ✓  5× build + carry (fits RCL4/1300)
     ],
 
