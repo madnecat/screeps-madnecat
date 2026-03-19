@@ -30,7 +30,7 @@ var roleFueler = {
             });
 
             if (tower) {
-                creep.say('⚡ fuel');
+                creep.say('⚡ F fuel');
                 if (creep.transfer(tower, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                     moveToTarget.move(creep, tower, { visualizePathStyle: { stroke: '#ff6600' }, reusePath: 5 });
                 }
@@ -38,7 +38,7 @@ var roleFueler = {
             }
 
             // All towers full — idle
-            creep.say('💤 full');
+            creep.say('💤 F full');
             return;
         }
 
@@ -65,11 +65,11 @@ var roleFueler = {
         var target = creep.pos.findClosestByPath(candidates);
 
         if (!target) {
-            creep.say('❌ no src');
+            creep.say('❌ F no src');
             return;
         }
 
-        creep.say('⛏ fuel');
+        creep.say('⛏ F fuel');
         if (target instanceof Source) {
             if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
                 moveToTarget.move(creep, target, { visualizePathStyle: { stroke: '#ff6600' }, ignoreCreeps: true, reusePath: 5 });
