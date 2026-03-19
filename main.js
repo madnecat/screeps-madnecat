@@ -11,6 +11,7 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader  = require('role.upgrader');
 var roleBuilder   = require('role.builder');
 var roleExplorer  = require('role.explorer');
+var roleFueler    = require('role.fueler');
 
 module.exports.loop = function () {
 
@@ -23,6 +24,7 @@ module.exports.loop = function () {
 
     // --- SPAWNING (priority order: harvesters first) ---
     coreSpawn.manageHarvesters();
+    coreSpawn.manageFuelers();
     coreSpawn.manageUpgrader();
     coreSpawn.manageBuilders();
     coreSpawn.manageExplorers();
@@ -110,6 +112,7 @@ module.exports.loop = function () {
         var creep = Game.creeps[name];
 
         if (creep.memory.role === 'harvester') roleHarvester.run(creep);
+        if (creep.memory.role === 'fueler')    roleFueler.run(creep);
         if (creep.memory.role === 'upgrader')  roleUpgrader.run(creep);
         if (creep.memory.role === 'builder')   roleBuilder.run(creep);
         if (creep.memory.role === 'explorer')  roleExplorer.run(creep);

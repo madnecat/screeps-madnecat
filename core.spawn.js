@@ -344,6 +344,25 @@ var coreSpawn = {
     },
 
     // ----------------------------------------------------------
+    // manageFuelers
+    //
+    // Maintains exactly 1 fueler at all times.
+    // Uses the cheapest harvester body tier — it just needs
+    // WORK + CARRY + MOVE to harvest and carry energy.
+    // Not counted as a harvester anywhere.
+    // ----------------------------------------------------------
+    manageFuelers: function () {
+        var fuelers = _.filter(Game.creeps, function (c) { return c.memory.role === 'fueler'; });
+        if (fuelers.length >= 1) return;
+
+        var spawn = this.getSpawn();
+        if (!spawn) return;
+
+        var body = this.selectBody(CONFIG.HARVESTER_TIERS, spawn.room);
+        this.trySpawn(spawn, body, 'fueler');
+    },
+
+    // ----------------------------------------------------------
     // manageExplorers
     //
     // Only spawns when economy prerequisites are met, and only

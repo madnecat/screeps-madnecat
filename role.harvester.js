@@ -95,8 +95,7 @@ var roleHarvester = {
                     filter: function (s) {
                         return (
                             (s.structureType === STRUCTURE_EXTENSION && (!assignedSource || assignedSource.pos.getRangeTo(s) <= 10)) ||
-                             s.structureType === STRUCTURE_SPAWN     ||
-                             s.structureType === STRUCTURE_TOWER
+                             s.structureType === STRUCTURE_SPAWN
                         ) && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                     }
                 });
@@ -171,8 +170,7 @@ var roleHarvester = {
                     filter: function (s) {
                         return (
                             (s.structureType === STRUCTURE_EXTENSION && (!assignedSource || assignedSource.pos.getRangeTo(s) <= 10)) ||
-                            s.structureType === STRUCTURE_SPAWN     ||
-                            s.structureType === STRUCTURE_TOWER
+                            s.structureType === STRUCTURE_SPAWN
                         ) && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                     }
                 });
