@@ -119,6 +119,23 @@ module.exports.loop = function () {
         var creep = Game.creeps[name];
 
         var cpuBefore = CONFIG.CPU_LOGGING ? Game.cpu.getUsed() : 0;
+
+        // --- MANUAL OVERRIDE ---
+        // Set via console: Game.creeps['Name'].memory.override = {x, y, room}
+        // Clear via console: delete Game.creeps['Name'].memory.override
+        if (creep.memory.override) {
+            var ov  = creep.memory.override;
+            var pos = new RoomPosition(ov.x, ov.y, ov.room || creep.room.name);
+            creep.say('📍 OVR');
+            if (creep.pos.isEqualTo(pos)) {
+                creep.say('✅ OVR done');
+                delete creep.memory.override;
+            } else {
+                creep.moveTo(pos, { visualizePathStyle: { stroke: '#ff00ff' }, reusePath: 5 });
+            }
+            continue;
+        }
+
         if (creep.memory.role === 'harvester') roleHarvester.run(creep);
         if (creep.memory.role === 'fueler')    roleFueler.run(creep);
         if (creep.memory.role === 'upgrader')  roleUpgrader.run(creep);
