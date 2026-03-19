@@ -70,23 +70,27 @@ var CONFIG = {
     // Parts: WORK=100, CARRY=50, MOVE=50
 
     HARVESTER_TIERS: [
-        [WORK, CARRY, MOVE],                                    //  200 — 1M:2 ✓
-        [WORK, WORK, CARRY, MOVE, MOVE],                        //  350 — 2M:3 ✓  2× harvest
-        [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                 //  450 — 2M:4 ✓  2× harvest + carry
-        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],     //  700 — 3M:5 ✓  3× harvest
+        [WORK, CARRY, MOVE],                                                        //  200 — 1M:2 ✓
+        [WORK, WORK, CARRY, MOVE, MOVE],                                            //  350 — 2M:3 ✓  2× harvest
+        [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                                     //  400 — 2M:4 ✓  2× harvest + carry
+        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  700 — 3M:5 ✓  3× harvest   (fits RCL3/800)
+        [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], //  900 — 4M:8 ✓  6× harvest   (fits RCL4/1300)
     ],
 
     UPGRADER_TIERS: [
-        [WORK, CARRY, MOVE],                                    //  200 — 1M:2 ✓
-        [WORK, WORK, CARRY, MOVE, MOVE],                        //  350 — 2M:3 ✓  2× upgrade
-        [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                 //  450 — 2M:4 ✓  2× upgrade + carry
-        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],     //  700 — 3M:5 ✓  3× upgrade
+        [WORK, CARRY, MOVE],                                                        //  200 — 1M:2 ✓
+        [WORK, WORK, CARRY, MOVE, MOVE],                                            //  350 — 2M:3 ✓  2× upgrade
+        [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                                     //  400 — 2M:4 ✓  2× upgrade + carry
+        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  700 — 3M:5 ✓  3× upgrade   (fits RCL3/800)
+        [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], //  900 — 4M:8 ✓  6× upgrade   (fits RCL4/1300)
     ],
 
     BUILDER_TIERS: [
-        [WORK, CARRY, MOVE],                                    //  200 — 1M:2 ✓
-        [WORK, WORK, CARRY, MOVE, MOVE],                        //  350 — 2M:3 ✓  2× build
-        [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                 //  450 — 2M:4 ✓  2× build + carry
+        [WORK, CARRY, MOVE],                                                        //  200 — 1M:2 ✓
+        [WORK, WORK, CARRY, MOVE, MOVE],                                            //  350 — 2M:3 ✓  2× build
+        [WORK, WORK, CARRY, CARRY, MOVE, MOVE],                                     //  400 — 2M:4 ✓  2× build + carry
+        [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],                         //  700 — 3M:5 ✓  3× build     (fits RCL3/800)
+        [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], // 850 — 4M:8 ✓  5× build + carry (fits RCL4/1300)
     ],
 
     EXPLORER_BODY: [MOVE, MOVE, MOVE],  // 150 — pure scout, fixed body
