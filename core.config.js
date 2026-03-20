@@ -19,7 +19,7 @@ var CONFIG = {
     // false (default): units wait until full before switching to work mode (efficient, fewer trips).
     // true:            units switch to work mode as soon as they carry any energy (responsive,
     //                  more trips but faster reaction — useful when short on harvesters).
-    DISPATCH_ON_MIN_ENERGY: false,
+    DISPATCH_ON_MIN_ENERGY: true,
 
     // --- Dynamic creep scaling ---
     // Targets are computed automatically each tick by computeSpawnPlan().
