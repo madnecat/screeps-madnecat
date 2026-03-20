@@ -51,6 +51,9 @@ var CONFIG = {
         8: 1,   // RCL 8 is max — one upgrader just maintains it
     },
 
+    // Minimum builders always alive (for repairs when no construction sites).
+    MIN_BUILDERS: 1,
+
     // Builders: scale with number of active construction sites
     BUILDERS_PER_SITES: [
         { minSites:  0, count: 0 },

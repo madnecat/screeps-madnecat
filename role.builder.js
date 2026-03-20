@@ -124,17 +124,15 @@ var roleBuilder = {
                 return;
             }
 
-            // No sites — repair structures below 50% HP only.
-            // Ignoring minor damage (99% HP roads etc.) prevents builders
-            // from getting stuck repairing in place indefinitely.
+            // No sites — repair structures below 70% HP, worst first.
             var damaged = creep.room.find(FIND_STRUCTURES, {
-                filter: s => s.hits < s.hitsMax * 0.5
+                filter: s => s.hits < s.hitsMax * 0.7
             });
             if (damaged.length > 0) {
                 var worst = _.min(damaged, s => s.hits / s.hitsMax);
                 creep.say('🔧 B Repair');
                 if (creep.repair(worst) === ERR_NOT_IN_RANGE) {
-                    moveToTarget.move(creep,worst, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
+                    moveToTarget.move(creep, worst, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
                 }
                 return;
             }

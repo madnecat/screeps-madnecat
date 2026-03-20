@@ -335,7 +335,7 @@ var coreSpawn = {
         var spawn = this.getSpawn();
         if (!spawn) return;
 
-        var target = Memory.spawnPlan ? Memory.spawnPlan.targets.builders : 1;
+        var target = Math.max(CONFIG.MIN_BUILDERS, Memory.spawnPlan ? Memory.spawnPlan.targets.builders : 1);
         if (builders.length < target) {
             var bBody = CONFIG.DISPATCH_ON_MIN_ENERGY
                 ? this.selectBodyAffordable(CONFIG.BUILDER_TIERS, spawn.room)
