@@ -354,7 +354,7 @@ var coreSpawn = {
     // ----------------------------------------------------------
     manageFuelers: function () {
         var fuelers = G.byRole('fueler');
-        if (fuelers.length >= 1) return;
+        if (fuelers.length >= CONFIG.TARGET_FUELERS) return;
 
         var spawn = this.getSpawn();
         if (!spawn) return;

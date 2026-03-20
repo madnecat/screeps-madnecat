@@ -31,12 +31,13 @@ var CONFIG = {
 
     // Harvesters: spawned per energy source in the room
     TARGET_MINERAL_HARVESTERS: 0,   // still static — needs Extractor @ RCL 6
-    HARVESTERS_PER_SOURCE:     2,   // 1 per source until containers are built at sources
+    TARGET_FUELERS:            2,   // set to 1 if tower stays full on its own
+    HARVESTERS_PER_SOURCE:     2.5, // 2.5 × 2 sources = 5 total harvesters
 
     // Fraction of total harvesters assigned to the main source (closest to spawn).
     // The rest go to secondary sources. Always at least 1 on main regardless of ratio.
-    // Example: 0.5 → 50/50 split | 0.25 → 1 main, 3 secondary (with 4 total harvesters)
-    MAIN_SOURCE_RATIO:         0.25,
+    // Example: 0.5 → 50/50 split | 0.4 → 2 main, 3 secondary (with 5 total harvesters)
+    MAIN_SOURCE_RATIO:         0.4,
 
     // Upgraders: scale with RCL — push hard early, back off at max level
     UPGRADERS_BY_RCL: {
