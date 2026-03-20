@@ -26,7 +26,7 @@ var CONFIG = {
     // Consult the current plan with: JSON.stringify(Memory.spawnPlan)
 
     // Harvesters: spawned per energy source in the room
-    TARGET_FUELERS:            1,   // set to 1 if tower stays full on its own
+    TARGET_FUELERS:            2,   // set to 1 if tower stays full on its own
     HARVESTERS_PER_SOURCE:     2, // 2.5 × 2 sources = 5 total harvesters
 
     // Fraction of total harvesters assigned to the main source (closest to spawn).
