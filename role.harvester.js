@@ -247,17 +247,6 @@ var roleHarvester = {
                 creep.memory.remoteRoom = null;
             }
         }
-
-        // Navigate to remote room if assigned and not there yet
-        if (creep.memory.remoteRoom && creep.room.name !== creep.memory.remoteRoom) {
-            creep.say('🚀 ' + creep.memory.remoteRoom);
-            moveToTarget.move(creep, new RoomPosition(25, 25, creep.memory.remoteRoom), {
-                visualizePathStyle: { stroke: '#00ff00' },
-                reusePath: 10
-            });
-            return;
-        }
-
         creep.say(creep.memory.remoteRoom ? '⛏ H Remote' : '⛏ H Energy');
 
         // Assign source based on MAIN_SOURCE_RATIO; persist across ticks.
