@@ -41,26 +41,26 @@ var CONFIG = {
 
     // Upgraders: scale with RCL — push hard early, back off at max level
     UPGRADERS_BY_RCL: {
-        1: 2,
-        2: 3,   // push hard early — travel inefficiency means you need more
-        3: 3,
+        1: 3,
+        2: 4,   // push hard early — travel inefficiency means you need more
+        3: 4,
         4: 2,
-        5: 3,
-        6: 3,
-        7: 4,
+        5: 2,
+        6: 2,
+        7: 2,
         8: 1,   // RCL 8 is max — one upgrader just maintains it
     },
 
     // Minimum builders always alive (for repairs when no construction sites).
-    MIN_BUILDERS: 0,
+    MIN_BUILDERS: 1,
 
     // Builders: scale with number of active construction sites
     BUILDERS_PER_SITES: [
         { minSites:  0, count: 0 },
         { minSites:  1, count: 1 },
         { minSites:  5, count: 2 },
-        { minSites: 15, count: 3 },
-        { minSites: 25, count: 4 },
+        { minSites: 15, count: 2 },
+        { minSites: 25, count: 3 },
     ],
 
     TARGET_EXPLORERS: 1,  // always 1 scout
