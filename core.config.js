@@ -15,10 +15,6 @@ var CONFIG = {
     // true: log per-creep CPU usage when > 1 and tick summaries every 100 ticks.
     CPU_LOGGING: false,
 
-    // --- Builder provider switch ---
-    // Set to true to allow builders to get energy from sources as much as containers.
-    BUILDERS_ALLOW_GET_FROM_SOURCE: true,
-
     // --- Minimum energy dispatch ---
     // false (default): units wait until full before switching to work mode (efficient, fewer trips).
     // true:            units switch to work mode as soon as they carry any energy (responsive,
@@ -30,7 +26,6 @@ var CONFIG = {
     // Consult the current plan with: JSON.stringify(Memory.spawnPlan)
 
     // Harvesters: spawned per energy source in the room
-    TARGET_MINERAL_HARVESTERS: 0,   // still static — needs Extractor @ RCL 6
     TARGET_FUELERS:            2,   // set to 1 if tower stays full on its own
     HARVESTERS_PER_SOURCE:     2.5, // 2.5 × 2 sources = 5 total harvesters
 
@@ -120,21 +115,6 @@ var CONFIG = {
     // Owned rooms are NEVER rescanned — permanently avoided.
     EXPLORER_RESCAN_INTERVAL: 28800,
 
-    // --- Extension placement ---
-    // Walking-step radius from spawn to search for extension spots.
-    // Increase if not enough tiles are found near your spawn.
-    EXTENSION_SEARCH_RADIUS: 8,
-
-    // --- Builder construction priority ---
-    // Higher number = built first. Structures not listed get priority 0.
-    BUILDER_SITE_PRIORITY: {
-        [STRUCTURE_EXTENSION]: 5,
-        [STRUCTURE_TOWER]:     4,
-        [STRUCTURE_STORAGE]:   3,
-        [STRUCTURE_CONTAINER]: 2,
-        [STRUCTURE_ROAD]:      1,
-    },
-
     // Maximum towers allowed per RCL (Screeps hard limits).
     TOWERS_PER_RCL: { 1:0, 2:0, 3:1, 4:1, 5:2, 6:2, 7:3, 8:6 },
 
@@ -144,17 +124,6 @@ var CONFIG = {
     // Only repair structures below this HP fraction (0-1).
     TOWER_REPAIR_THRESHOLD: 0.8,
 
-    // Maximum extensions allowed per RCL (Screeps hard limits).
-    EXTENSIONS_PER_RCL: {
-        1: 0,
-        2: 5,
-        3: 10,
-        4: 20,
-        5: 30,
-        6: 40,
-        7: 50,
-        8: 60
-    },
 };
 
 module.exports = CONFIG;

@@ -146,107 +146,34 @@ var roleBuilder = {
 
         // ----------------------------------------------------------
         // STATE: HARVESTING
-        // Priority: closest container with energy → closest source
+        // Go to the closest energy source: storage, container, or source.
         // ----------------------------------------------------------
+        var candidates = [];
 
-        // Energy pickup — exhaust every non-source option before mining directly.
-        // Harvesters are responsible for sources; builders should never need to mine.
-
-        // 1. Dropped energy on the ground (decays every tick — highest urgency)
-        var dropped = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-            filter: r => r.resourceType === RESOURCE_ENERGY && r.amount > 0
-        });
-        if (dropped) {
-            creep.say('🔄 B Drop');
-            if (creep.pickup(dropped) === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep,dropped, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
-            return;
-        }
-
-        // 2. Tombstones — dead creeps carrying energy
-        var tombstone = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
-            filter: t => t.store[RESOURCE_ENERGY] > 0
-        });
-        if (tombstone) {
-            creep.say('🔄 B Tomb');
-            if (creep.withdraw(tombstone, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep,tombstone, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
-            return;
-        }
-
-        // 3. Ruins — decaying structures with leftover energy
-        var ruin = creep.pos.findClosestByRange(FIND_RUINS, {
-            filter: r => r.store[RESOURCE_ENERGY] > 0
-        });
-        if (ruin) {
-            creep.say('🔄 B Ruin');
-            if (creep.withdraw(ruin, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep,ruin, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
-            return;
-        }
-
-        // 4. Storage
         var storage = creep.room.storage;
-        if (storage && storage.store[RESOURCE_ENERGY] > 0) {
-            creep.say('🔄 B Store');
-            if (creep.withdraw(storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep,storage, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
-            return;
-        }
+        if (storage && storage.store[RESOURCE_ENERGY] > 0) candidates.push(storage);
 
-        // alt 5. Containers filled by harvesters or source directly
-        if (CONFIG.BUILDERS_ALLOW_GET_FROM_SOURCE) {
-            creep.say('🔄 B s||c');
-            var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 })
-                        || creep.pos.findClosestByRange(FIND_SOURCES);
-
-            var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: s => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0
-            });
-
-            var candidates = [];
-            if (source)    candidates.push(source);
-            if (container) candidates.push(container);
-            var target = creep.pos.findClosestByRange(candidates);
-            // Sources require harvest(), structures require withdraw() — use the right call.
-            var actionResult = (target === source)
-                ? creep.harvest(target)
-                : creep.withdraw(target, RESOURCE_ENERGY);
-            if (actionResult === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep, target, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
-            return;
-        }
-
-        // 5. Containers filled by harvesters
-        var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+        var containers = creep.room.find(FIND_STRUCTURES, {
             filter: s => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0
         });
-        if (container) {
-            creep.say('🔄 B Cont');
-            if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep,container, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
+        candidates = candidates.concat(containers);
+
+        var sources = creep.room.find(FIND_SOURCES, { filter: s => s.energy > 0 });
+        if (!sources.length) sources = creep.room.find(FIND_SOURCES);
+        candidates = candidates.concat(sources);
+
+        var target = creep.pos.findClosestByRange(candidates);
+        if (!target) {
+            if (Game.time % 20 === 0) console.log('[Builder] ' + creep.name + ' could not find any energy!');
             return;
         }
 
-        // 6. Last resort: mine directly from source
-        var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: s => s.energy > 0 })
-                  || creep.pos.findClosestByRange(FIND_SOURCES);
-        if (source) {
-            creep.say('🔄 B Source');
-            if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-                moveToTarget.move(creep,source, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
-            }
-            return;
-        }
-
-        if (Game.time % 20 === 0) {
-            console.log('[Builder] ' + creep.name + ' could not find any energy!');
+        creep.say('🔄 B Get');
+        var actionResult = (target.structureType === undefined)
+            ? creep.harvest(target)
+            : creep.withdraw(target, RESOURCE_ENERGY);
+        if (actionResult === ERR_NOT_IN_RANGE) {
+            moveToTarget.move(creep, target, { visualizePathStyle: { stroke: '#ff4444' }, reusePath: 5 });
         }
     }
 };
